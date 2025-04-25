@@ -17,4 +17,4 @@ if ($_SESSION['role'] === 'admin') {
             <li><a href='admin/content.php'>Управление контентом</a></li>
           </ul>";
 }
-?>
+
