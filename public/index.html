@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Привети | Веб-приложение</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background: #4f46e5;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    nav a {
+      margin-left: 1rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .hero {
+      padding: 4rem 2rem;
+      text-align: center;
+      background-color: #e0e7ff;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    .admin-panel, .protected-content, .public-content {
+      margin-top: 2rem;
+    }
+    footer {
+      margin-top: 4rem;
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Toyota center</div>
+    <nav>
+      <a href="#login">Вход</a>
+      <a href="#register">Регистрация</a>
+      <a href="#public">Общий раздел</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Добро пожаловать в Toyota center</h1>
+    <p>Современное веб-приложение для взаимодействия и управления ресурсами</p>
+  </section>
+
+  <div class="container" id="public">
+    <h2>Общедоступный контент</h2>
+    <p>Примеры динамически подгружаемых данных...</p>
+  </div>
+
+  <div class="container" id="create-resource">
+    <h2>Создать ресурс</h2>
+    <form>
+      <div class="form-group">
+        <label>Название ресурса</label>
+        <input type="text" required>
+      </div>
+      <div class="form-group">
+        <label>Категория</label>
+        <select>
+          <option>Категория 1</option>
+          <option>Категория 2</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Описание</label>
+        <textarea rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Тип доступа</label>
+        <input type="radio" name="access" checked> Публичный
+        <input type="radio" name="access"> Приватный
+      </div>
+      <div class="form-group">
+        <label>Дата публикации</label>
+        <input type="date">
+      </div>
+      <button type="submit">Создать</button>
+    </form>
+  </div>
+
+  <div class="container" id="search">
+    <h2>Поиск ресурсов</h2>
+    <form>
+      <input type="text" placeholder="Поиск по названию или категории">
+      <button type="submit">Найти</button>
+    </form>
+  </div>
+
+  <div class="container protected-content">
+    <h2>Контент только для авторизованных пользователей</h2>
+    <p>Здесь отображается защищённая информация.</p>
+  </div>
+
+  <div class="container admin-panel">
+    <h2>Админ-панель</h2>
+    <ul>
+      <li>Создание администратора</li>
+      <li>Управление записями</li>
+      <li>Редактирование контента</li>
+      <li>Удаление пользователей</li>
+      <li>Просмотр логов</li>
+      <li>Изменение ролей</li>
+      <li>Управление правами доступа</li>
+    </ul>
+  </div>
+
+  <footer>
+    &copy; 2025 Toyota center. Все права защищены.
+  </footer>
+</body>
+</html>
