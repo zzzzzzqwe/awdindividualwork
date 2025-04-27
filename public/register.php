@@ -22,7 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
         try {
             $stmt->execute([$username, $email, $hashed]);
+            
             $_SESSION['user'] = $username;
+            $_SESSION['role'] = 'user';
+    
             header('Location: dashboard.php');
             exit;
         } catch (PDOException $e) {
@@ -38,6 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="password" name="password" placeholder="Пароль" required><br>
     <button type="submit">Зарегистрироваться</button>
 </form>
+<br>
+<form action="login.php" method="get">
+    <button type="submit">Войти</button>
+</form>
+
 
 <?php
 if (!empty($errors)) {
