@@ -33,6 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="password" name="password" placeholder="Пароль" required><br>
     <button type="submit">Войти</button>
 </form>
+<br>
+<form action="register.php" method="get">
+    <button type="submit">Зарегистрироваться</button>
+</form>
+
 
 <?php
 if (!empty($errors)) {
