@@ -5,6 +5,7 @@ ini_set('display_errors', 1);
 require_once '../auth/check_admin.php';
 require_once '../config/config.php';
 
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
 $pdo = getPDO();
 $errors = [];
 
@@ -15,9 +16,8 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int)$_GET['id'];
 
-// Обработка формы
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update' && $isAdmin) {
-    $id = (int)$_POST['id'];
     $title = trim($_POST['title']);
     $body = trim($_POST['body']);
     $category = $_POST['category'];
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         header('Location: content.php');
         exit;
     } else {
-        // для редактирования повторно загружаю запись, чтобы отобразить в форме
+        // повторно заполняем форму при ошибке
         $editData = [
             'id' => $id,
             'title' => $title,
@@ -63,14 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     }
 }
 
+if (!isset($editData)) {
+    $stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
+    $stmt->execute([$id]);
+    $editData = $stmt->fetch();
 
-$stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
-$stmt->execute([$id]);
-$data = $stmt->fetch();
-
-if (!$data) {
-    echo "Запись не найдена.";
-    exit;
+    if (!$editData) {
+        echo "Запись не найдена.";
+        exit;
+    }
 }
 ?>
 
@@ -82,41 +83,47 @@ if (!$data) {
 </head>
 <body>
 
-<h2>Редактировать запись ID <?= $id ?></h2>
+<h2>Редактировать запись ID <?= $editData['id'] ?></h2>
 <a href="content.php">← Назад к записям</a><br><br>
 
 <?php if (!empty($errors)): ?>
     <div style="color:red;">
-        <?php foreach ($errors as $err): ?>
-            <p><?= htmlspecialchars($err) ?></p>
-        <?php endforeach; ?>
+        <strong>Обнаружены ошибки:</strong>
+        <ul>
+            <?php foreach ($errors as $err): ?>
+                <li><?= htmlspecialchars($err) ?></li>
+            <?php endforeach; ?>
+        </ul>
     </div>
 <?php endif; ?>
 
 <form method="post">
+    <input type="hidden" name="action" value="update">
+    <input type="hidden" name="id" value="<?= $editData['id'] ?>">
+
     <label>Заголовок:<br>
-        <input type="text" name="title" value="<?= htmlspecialchars($data['title']) ?>" required>
+        <input type="text" name="title" value="<?= htmlspecialchars($editData['title']) ?>" required>
     </label><br><br>
 
     <label>Содержимое:<br>
-        <textarea name="body" rows="5" cols="60" required><?= htmlspecialchars($data['body']) ?></textarea>
+        <textarea name="body" rows="5" cols="60" required><?= htmlspecialchars($editData['body']) ?></textarea>
     </label><br><br>
 
     <label>Категория:
         <select name="category" required>
             <?php foreach (['Новости', 'Объявления', 'Статьи'] as $cat): ?>
-                <option value="<?= $cat ?>" <?= $data['category'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
+                <option value="<?= $cat ?>" <?= $editData['category'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
             <?php endforeach; ?>
         </select>
     </label><br><br>
 
     <label>Публично?<br>
-        <input type="radio" name="is_public" value="yes" <?= $data['is_public'] ? 'checked' : '' ?>> Да
-        <input type="radio" name="is_public" value="no" <?= !$data['is_public'] ? 'checked' : '' ?>> Нет
+        <input type="radio" name="is_public" value="yes" <?= $editData['is_public'] ? 'checked' : '' ?>> Да
+        <input type="radio" name="is_public" value="no" <?= !$editData['is_public'] ? 'checked' : '' ?>> Нет
     </label><br><br>
 
     <label>Автор:<br>
-        <input type="text" name="author" value="<?= htmlspecialchars($data['author']) ?>" required>
+        <input type="text" name="author" value="<?= htmlspecialchars($editData['author']) ?>" required>
     </label><br><br>
 
     <button type="submit">Сохранить</button>
