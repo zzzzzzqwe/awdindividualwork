@@ -187,6 +187,7 @@ $contents = $stmt->fetchAll();
             <tr>
                 <th>ID</th>
                 <th>Заголовок</th>
+                <th>Содержимое</th>
                 <th>Категория</th>
                 <th>Публично</th>
                 <th>Автор</th>
@@ -201,6 +202,7 @@ $contents = $stmt->fetchAll();
             <tr>
                 <td><?= $c['id'] ?></td>
                 <td><?= htmlspecialchars($c['title']) ?></td>
+                <td><?= nl2br(htmlspecialchars($c['body'])) ?></td>
                 <td><?= htmlspecialchars($c['category']) ?></td>
                 <td><?= $c['is_public'] ? 'Да' : 'Нет' ?></td>
                 <td><?= htmlspecialchars($c['author']) ?></td>
