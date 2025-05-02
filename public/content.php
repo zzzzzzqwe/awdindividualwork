@@ -117,6 +117,7 @@ $contents = $stmt->fetchAll();
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<link rel="stylesheet" href="css/content.css">
     <meta charset="UTF-8">
     <title>Контент</title>
 </head>
