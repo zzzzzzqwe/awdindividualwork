@@ -9,15 +9,34 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-echo "<h1>Добро пожаловать, {$_SESSION['user']}!</h1>";
-echo "<p>Ваша роль: {$_SESSION['role']}</p>";
-echo "<a href='logout.php'>Выйти</a>";
+$username = $_SESSION['user'] ?? 'Гость';
+$role = $_SESSION['role'] ?? 'user';
+$isAdmin = $role === 'admin';
+?>
 
-if ($_SESSION['role'] === 'admin') {
-    echo "<hr><h2>Админ-панель</h2>";
-    echo "<ul>
-            <li><a href='admin/users.php'>Управление пользователями</a></li>
-            <li><a href='admin/content.php'>Управление контентом</a></li>
-          </ul>";
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель пользователя</title>
+</head>
+<body>
 
+<h1>Добро пожаловать, <?= htmlspecialchars($username) ?>!</h1>
+<p>Ваша роль: <?= htmlspecialchars($role) ?></p>
+
+<a href="logout.php">Выйти</a><br><br>
+
+<a href="content.php">Перейти к записям</a><br><br>
+
+<?php if ($isAdmin): ?>
+    <hr>
+    <h2>Админ-панель</h2>
+    <ul>
+        <li><a href="admin/users.php">Управление пользователями</a></li>
+        <li><a href="content.php">Управление контентом</a></li>
+    </ul>
+<?php endif; ?>
+
+</body>
+</html>

@@ -1,37 +1,95 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once '../auth/check_auth.php';
 require_once '../config/config.php';
 
 $pdo = getPDO();
+$errors = [];
 
+$role = $_SESSION['role'] ?? 'user';
+$isAdmin = $role === 'admin';
 
-$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+$editData = null;
 
+// service: create
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add' && $isAdmin) {
+    $title = trim($_POST['title'] ?? '');
+    $body = trim($_POST['body'] ?? '');
+    $category = $_POST['category'] ?? '';
+    $is_public = ($_POST['is_public'] ?? '') === 'yes';
+    $author = trim($_POST['author'] ?? '');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isAdmin) {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'add') {
-        $title = trim($_POST['title'] ?? '');
-        $body = trim($_POST['body'] ?? '');
-
-        if ($title !== '' && $body !== '') {
-            $stmt = $pdo->prepare("INSERT INTO content (title, body) VALUES (?, ?)");
-            $stmt->execute([$title, $body]);
-        }
-    } elseif ($action === 'delete') {
-        $contentId = (int)($_POST['content_id'] ?? 0);
-
-        if ($contentId > 0) {
-            $stmt = $pdo->prepare("DELETE FROM content WHERE id = ?");
-            $stmt->execute([$contentId]);
-        }
+    if ($title === '' || $body === '' || $category === '' || $author === '') {
+        $errors[] = 'Все поля обязательны.';
     }
+
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("INSERT INTO content (title, body, category, is_public, author) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$title, $body, $category, $is_public ? 'true' : 'false', $author]);
+        header('Location: content.php');
+        exit;
+    }
+}
+
+// service: delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete' && $isAdmin) {
+    $id = (int)$_POST['content_id'];
+    $pdo->prepare("DELETE FROM content WHERE id = ?")->execute([$id]);
     header('Location: content.php');
     exit;
 }
 
-$stmt = $pdo->query("SELECT id, title, body, created_at FROM content ORDER BY created_at DESC");
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit' && $isAdmin) {
+    $editId = (int)$_POST['content_id'];
+    $stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
+    $stmt->execute([$editId]);
+    $editData = $stmt->fetch();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update' && $isAdmin) {
+    $id = (int)$_POST['id'];
+    $title = trim($_POST['title']);
+    $body = trim($_POST['body']);
+    $category = $_POST['category'];
+    $is_public = ($_POST['is_public'] ?? '') === 'yes';
+    $author = trim($_POST['author']);
+
+    $stmt = $pdo->prepare("UPDATE content SET title = ?, body = ?, category = ?, is_public = ?, author = ? WHERE id = ?");
+    $stmt->execute([$title, $body, $category, $is_public ? 'true' : 'false', $author, $id]);
+    header('Location: content.php');
+    exit;
+}
+
+// Поиск
+$where = [];
+$params = [];
+
+if (!empty($_GET['search_title'])) {
+    $where[] = 'title ILIKE ?';
+    $params[] = '%' . $_GET['search_title'] . '%';
+}
+if (!empty($_GET['search_category'])) {
+    $where[] = 'category = ?';
+    $params[] = $_GET['search_category'];
+}
+if (!empty($_GET['search_author'])) {
+    $where[] = 'author ILIKE ?';
+    $params[] = '%' . $_GET['search_author'] . '%';
+}
+if (!$isAdmin) {
+    $where[] = 'is_public = true';
+}
+
+$sql = 'SELECT * FROM content';
+if ($where) {
+    $sql .= ' WHERE ' . implode(' AND ', $where);
+}
+$sql .= ' ORDER BY created_at DESC';
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $contents = $stmt->fetchAll();
 ?>
 
@@ -39,62 +97,124 @@ $contents = $stmt->fetchAll();
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Просмотр контента</title>
+    <title>Контент</title>
 </head>
 <body>
 
-<h2>Просмотр контента</h2>
-<a href="../dashboard.php">← Назад в панель</a><br><br>
+<h2>Просмотр записей</h2>
+<a href="dashboard.php">← Назад</a><br><br>
 
+<!-- create form -->
 <?php if ($isAdmin): ?>
     <h3>Добавить новую запись</h3>
     <form method="post">
         <input type="hidden" name="action" value="add">
         <input type="text" name="title" placeholder="Заголовок" required><br><br>
-        <textarea name="body" placeholder="Текст" rows="5" cols="50" required></textarea><br><br>
+        <textarea name="body" placeholder="Содержимое" rows="5" cols="50" required></textarea><br><br>
+        <label>Категория:
+            <select name="category" required>
+                <option value="">-- Выберите --</option>
+                <option value="Новости">Новости</option>
+                <option value="Объявления">Объявления</option>
+                <option value="Статьи">Статьи</option>
+            </select>
+        </label><br><br>
+        <label>Публично?
+            <input type="radio" name="is_public" value="yes" checked> Да
+            <input type="radio" name="is_public" value="no"> Нет
+        </label><br><br>
+        <input type="text" name="author" placeholder="Автор" required><br><br>
         <button type="submit">Добавить</button>
     </form>
-
     <hr>
 <?php endif; ?>
 
-<h3>Список записей</h3>
+<!-- search form -->
+<h3>Поиск</h3>
+<form method="get">
+    <input type="text" name="search_title" placeholder="Заголовок" value="<?= htmlspecialchars($_GET['search_title'] ?? '') ?>">
+    <input type="text" name="search_author" placeholder="Автор" value="<?= htmlspecialchars($_GET['search_author'] ?? '') ?>">
+    <select name="search_category">
+        <option value="">-- Категория --</option>
+        <option value="Новости" <?= ($_GET['search_category'] ?? '') === 'Новости' ? 'selected' : '' ?>>Новости</option>
+        <option value="Объявления" <?= ($_GET['search_category'] ?? '') === 'Объявления' ? 'selected' : '' ?>>Объявления</option>
+        <option value="Статьи" <?= ($_GET['search_category'] ?? '') === 'Статьи' ? 'selected' : '' ?>>Статьи</option>
+    </select>
+    <button type="submit">Найти</button>
+</form>
 
+<hr>
+
+<h3>Список записей</h3>
 <?php if (empty($contents)): ?>
-    <p>Нет записей в базе данных.</p>
+    <p>Ничего не найдено.</p>
 <?php else: ?>
     <table border="1" cellpadding="8">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Заголовок</th>
-                <th>Текст</th>
-                <th>Дата создания</th>
+                <th>Категория</th>
+                <th>Публично</th>
+                <th>Автор</th>
+                <th>Дата</th>
                 <?php if ($isAdmin): ?>
                     <th>Действия</th>
                 <?php endif; ?>
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($contents as $content): ?>
+        <?php foreach ($contents as $c): ?>
             <tr>
-                <td><?= htmlspecialchars($content['id']) ?></td>
-                <td><?= htmlspecialchars($content['title']) ?></td>
-                <td><?= nl2br(htmlspecialchars($content['body'])) ?></td>
-                <td><?= htmlspecialchars($content['created_at']) ?></td>
+                <td><?= $c['id'] ?></td>
+                <td><?= htmlspecialchars($c['title']) ?></td>
+                <td><?= htmlspecialchars($c['category']) ?></td>
+                <td><?= $c['is_public'] ? 'Да' : 'Нет' ?></td>
+                <td><?= htmlspecialchars($c['author']) ?></td>
+                <td><?= $c['created_at'] ?></td>
                 <?php if ($isAdmin): ?>
                     <td>
-                        <form method="post" style="display:inline;" onsubmit="return confirm('Удалить запись?');">
-                            <input type="hidden" name="content_id" value="<?= $content['id'] ?>">
+                        <!-- delete -->
+                        <form method="post" style="display:inline;" onsubmit="return confirm('Удалить?');">
                             <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="content_id" value="<?= $c['id'] ?>">
                             <button type="submit">Удалить</button>
                         </form>
+                        <!-- update link -->
+                        <form action="edit.php" method="get" style="display:inline;">
+                        <input type="hidden" name="id" value="<?= $c['id'] ?>">
+                         <button type="submit">Редактировать</button>
+                            </form>
                     </td>
                 <?php endif; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
+<?php endif; ?>
+
+<?php if ($editData): ?>
+    <hr>
+    <h3>Редактировать запись ID <?= $editData['id'] ?></h3>
+    <form method="post">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="id" value="<?= $editData['id'] ?>">
+        <input type="text" name="title" value="<?= htmlspecialchars($editData['title']) ?>" required><br><br>
+        <textarea name="body" rows="5" cols="50" required><?= htmlspecialchars($editData['body']) ?></textarea><br><br>
+        <label>Категория:
+            <select name="category" required>
+                <?php foreach (['Новости', 'Объявления', 'Статьи'] as $cat): ?>
+                    <option value="<?= $cat ?>" <?= $editData['category'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label><br><br>
+        <label>Публично?
+            <input type="radio" name="is_public" value="yes" <?= $editData['is_public'] ? 'checked' : '' ?>> Да
+            <input type="radio" name="is_public" value="no" <?= !$editData['is_public'] ? 'checked' : '' ?>> Нет
+        </label><br><br>
+        <input type="text" name="author" value="<?= htmlspecialchars($editData['author']) ?>" required><br><br>
+        <button type="submit">Сохранить</button>
+    </form>
 <?php endif; ?>
 
 </body>
