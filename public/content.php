@@ -21,9 +21,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add' 
     $is_public = ($_POST['is_public'] ?? '') === 'yes';
     $author = trim($_POST['author'] ?? '');
 
-    if ($title === '' || $body === '' || $category === '' || $author === '') {
-        $errors[] = 'Все поля обязательны.';
-    }
+
+if (strlen($title) < 5 || strlen($title) > 100) {
+    $errors[] = 'Заголовок должен быть от 5 до 100 символов.';
+}
+
+
+if (strlen($body) < 10) {
+    $errors[] = 'Содержимое должно быть не короче 10 символов.';
+}
+
+
+$allowedCategories = ['Новости', 'Объявления', 'Статьи'];
+if (!in_array($category, $allowedCategories)) {
+    $errors[] = 'Выберите допустимую категорию.';
+}
+
+// только буквы, пробелы, дефис, от 3 до 50 символов
+if (!preg_match('/^[А-Яа-яA-Za-zЁё\s\-]{3,50}$/u', $author)) {
+    $errors[] = 'Имя автора должно содержать только буквы и быть от 3 до 50 символов.';
+}
+
+if (!in_array($_POST['is_public'] ?? '', ['yes', 'no'])) {
+    $errors[] = 'Некорректный флаг публичности.';
+}
 
     if (empty($errors)) {
         $stmt = $pdo->prepare("INSERT INTO content (title, body, category, is_public, author) VALUES (?, ?, ?, ?, ?)");
@@ -103,6 +124,18 @@ $contents = $stmt->fetchAll();
 
 <h2>Просмотр записей</h2>
 <a href="dashboard.php">← Назад</a><br><br>
+
+<!-- error display -->
+<?php if (!empty($errors)): ?>
+    <div style="color: red;">
+        <strong>Ошибка:</strong>
+        <ul>
+            <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 
 <!-- create form -->
 <?php if ($isAdmin): ?>
