@@ -16,15 +16,33 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $id = (int)$_GET['id'];
 
 // Обработка формы
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update' && $isAdmin) {
+    $id = (int)$_POST['id'];
     $title = trim($_POST['title']);
     $body = trim($_POST['body']);
-    $category = $_POST['category'] ?? '';
+    $category = $_POST['category'];
     $is_public = ($_POST['is_public'] ?? '') === 'yes';
     $author = trim($_POST['author']);
 
-    if ($title === '' || $body === '' || $category === '' || $author === '') {
-        $errors[] = 'Все поля обязательны.';
+    if (strlen($title) < 5 || strlen($title) > 100) {
+        $errors[] = 'Заголовок должен быть от 5 до 100 символов.';
+    }
+
+    if (strlen($body) < 10) {
+        $errors[] = 'Содержимое должно быть не короче 10 символов.';
+    }
+
+    $allowedCategories = ['Новости', 'Объявления', 'Статьи'];
+    if (!in_array($category, $allowedCategories)) {
+        $errors[] = 'Выберите допустимую категорию.';
+    }
+
+    if (!preg_match('/^[А-Яа-яA-Za-zЁё\s\-]{3,50}$/u', $author)) {
+        $errors[] = 'Имя автора должно быть от 3 до 50 букв.';
+    }
+
+    if (!in_array($_POST['is_public'] ?? '', ['yes', 'no'])) {
+        $errors[] = 'Некорректный флаг публичности.';
     }
 
     if (empty($errors)) {
@@ -32,10 +50,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$title, $body, $category, $is_public ? 'true' : 'false', $author, $id]);
         header('Location: content.php');
         exit;
+    } else {
+        // для редактирования повторно загружаю запись, чтобы отобразить в форме
+        $editData = [
+            'id' => $id,
+            'title' => $title,
+            'body' => $body,
+            'category' => $category,
+            'is_public' => $is_public,
+            'author' => $author,
+        ];
     }
 }
 
-// Загрузка данных записи
+
 $stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
 $stmt->execute([$id]);
 $data = $stmt->fetch();
