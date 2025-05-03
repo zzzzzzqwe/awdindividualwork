@@ -202,7 +202,6 @@ $contents = $stmt->fetchAll();
     </table>
 <?php endif; ?>
 
-<?php if ($isAdmin): ?>
     <h3>Добавить новую запись</h3>
     <form method="post">
         <input type="hidden" name="action" value="add">
@@ -224,7 +223,7 @@ $contents = $stmt->fetchAll();
         <button type="submit">Добавить</button>
     </form>
     <hr>
-<?php endif; ?>
+
 
 <hr>
 
