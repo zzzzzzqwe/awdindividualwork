@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="button" id="toggleRegPassword">🙉</button>
         </div>
         <button type="submit">Зарегистрироваться</button>
+        <a href="login.php">Есть аккаунт? Войти</a>
     </form>
 </div>
 

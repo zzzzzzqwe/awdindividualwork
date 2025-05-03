@@ -138,31 +138,6 @@ $contents = $stmt->fetchAll();
     </div>
 <?php endif; ?>
 
-<!-- create form -->
-<?php if ($isAdmin): ?>
-    <h3>Добавить новую запись</h3>
-    <form method="post">
-        <input type="hidden" name="action" value="add">
-        <input type="text" name="title" placeholder="Заголовок" required><br><br>
-        <textarea name="body" placeholder="Содержимое" rows="5" cols="50" required></textarea><br><br>
-        <label>Категория:
-            <select name="category" required>
-                <option value="">-- Выберите --</option>
-                <option value="Новости">Новости</option>
-                <option value="Объявления">Объявления</option>
-                <option value="Статьи">Статьи</option>
-            </select>
-        </label><br><br>
-        <label>Публично?
-            <input type="radio" name="is_public" value="yes" checked> Да
-            <input type="radio" name="is_public" value="no"> Нет
-        </label><br><br>
-        <input type="text" name="author" placeholder="Автор" required><br><br>
-        <button type="submit">Добавить</button>
-    </form>
-    <hr>
-<?php endif; ?>
-
 <!-- search form -->
 <h3>Поиск</h3>
 <form method="get">
@@ -176,9 +151,7 @@ $contents = $stmt->fetchAll();
     </select>
     <button type="submit">Найти</button>
 </form>
-
-<hr>
-
+<!-- create form -->
 <h3>Список записей</h3>
 <?php if (empty($contents)): ?>
     <p>Ничего не найдено.</p>
@@ -228,6 +201,33 @@ $contents = $stmt->fetchAll();
         </tbody>
     </table>
 <?php endif; ?>
+
+<?php if ($isAdmin): ?>
+    <h3>Добавить новую запись</h3>
+    <form method="post">
+        <input type="hidden" name="action" value="add">
+        <input type="text" name="title" placeholder="Заголовок" required><br><br>
+        <textarea name="body" placeholder="Содержимое" rows="5" cols="50" required></textarea><br><br>
+        <label>Категория:
+            <select name="category" required>
+                <option value="">-- Выберите --</option>
+                <option value="Новости">Новости</option>
+                <option value="Объявления">Объявления</option>
+                <option value="Статьи">Статьи</option>
+            </select>
+        </label><br><br>
+        <label>Публично?
+            <input type="radio" name="is_public" value="yes" checked> Да
+            <input type="radio" name="is_public" value="no"> Нет
+        </label><br><br>
+        <input type="text" name="author" placeholder="Автор" required><br><br>
+        <button type="submit">Добавить</button>
+    </form>
+    <hr>
+<?php endif; ?>
+
+<hr>
+
 
 <?php if ($editData): ?>
     <hr>
