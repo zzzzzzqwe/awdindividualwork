@@ -13,10 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Все поля обязательны для заполнения.';
     }
 
+    if (strlen($username) < 3) {
+        $errors[] = 'Имя пользователя должно быть от 3 символов.';
+    }
+    
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'Некорректный email.';
     }
 
+    if (strlen($password) < 6) {
+        $errors[] = 'Пароль должен быть от 6 символов.';
+    }
+    
     if (empty($errors)) {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         $pdo = getPDO();
