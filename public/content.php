@@ -207,7 +207,7 @@ $contents = $stmt->fetchAll();
                 <td><?= htmlspecialchars($c['category']) ?></td>
                 <td><?= $c['is_public'] ? 'Да' : 'Нет' ?></td>
                 <td><?= htmlspecialchars($c['author']) ?></td>
-                <td><?= $c['created_at'] ?></td>
+                <td><?= date('Y-m-d H:i:s', strtotime($c['created_at'])) ?></td>
                 <?php if ($isAdmin): ?>
                     <td>
                         <!-- delete -->
