@@ -22,6 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$username]);
     if ($stmt->fetchColumn() > 0) $errors[] = 'Такой пользователь уже существует.';
 
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    if ($stmt->fetchColumn() > 0) {
+    $errors[] = 'Пользователь с таким email уже существует.';
+}
+
     if (empty($errors)) {
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)");

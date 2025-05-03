@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/config.php';
+$pdo = getPDO();
 
 $errors = [];
 
@@ -14,15 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (strlen($username) < 3) {
-        $errors[] = 'Имя пользователя должно быть от 3 символов.';
+        $errors[] = "Имя пользователя должно быть от 3 символов.";
     }
     
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Некорректный email.';
+        $errors[] = "Некорректный email.";
     }
 
     if (strlen($password) < 6) {
-        $errors[] = 'Пароль должен быть от 6 символов.';
+        $errors[] = "Пароль должен быть от 6 символов.";
+    }
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    if ($stmt->fetchColumn() > 0) {
+    $errors[] = "Пользователь с таким именем уже существует.";
     }
     
     if (empty($errors)) {
@@ -72,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="button" id="toggleRegPassword">🙉</button>
         </div>
         <button type="submit">Зарегистрироваться</button>
+        <a href="login.php">Есть аккаунт? Войти</a>
     </form>
 </div>
 

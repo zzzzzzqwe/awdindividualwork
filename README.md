@@ -7,6 +7,8 @@
 
 todo:
 - double check validation for register
+- create from admin panel with used email
+- create new user with user username
 
 
 1. Аутентификация пользователей::
