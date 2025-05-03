@@ -40,6 +40,8 @@ function getUsernameById($id, $pdo) {
 ?>
 
 <h2>Управление пользователями</h2>
+<link rel="stylesheet" href="../css/users.css">
+<script src="../js/users.js"></script>
 <a href="../dashboard.php">← Назад</a><br><br>
 <a href="create_user.php">+ Добавить пользователя</a><br><br>
 
