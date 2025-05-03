@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 require_once '../auth/check_admin.php';
 require_once '../config/config.php';
 
-$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';   
 $pdo = getPDO();
 $errors = [];
 
