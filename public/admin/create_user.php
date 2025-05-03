@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<link rel="stylesheet" href="../css/users.css">
     <meta charset="UTF-8">
     <title>Создание пользователя</title>
 </head>
