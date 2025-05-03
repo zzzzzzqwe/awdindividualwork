@@ -41,6 +41,7 @@ function getUsernameById($id, $pdo) {
 
 <h2>Управление пользователями</h2>
 <a href="../dashboard.php">← Назад</a><br><br>
+<a href="create_user.php">+ Добавить пользователя</a><br><br>
 
 <table border="1" cellpadding="8">
     <tr>
@@ -57,7 +58,7 @@ function getUsernameById($id, $pdo) {
         <td><?= htmlspecialchars($user['username']) ?></td>
         <td><?= htmlspecialchars($user['email']) ?></td>
         <td><?= htmlspecialchars($user['role']) ?></td>
-        <td><?= htmlspecialchars($user['created_at']) ?></td>
+        <td><?= date('Y-m-d H:i:s', strtotime($user['created_at'])) ?></td>
         <td>
             <?php if ($user['role'] !== 'admin'): ?>
                 <form method="post" style="display:inline;">
@@ -81,3 +82,4 @@ function getUsernameById($id, $pdo) {
     </tr>
     <?php endforeach; ?>
 </table>
+
