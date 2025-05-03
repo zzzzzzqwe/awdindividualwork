@@ -16,7 +16,17 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int)$_GET['id'];
 
+// Получение текущей записи
+$stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
+$stmt->execute([$id]);
+$content = $stmt->fetch();
 
+if (!$content) {
+    echo "Запись не найдена.";
+    exit;
+}
+
+// Обновление
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update' && $isAdmin) {
     $title = trim($_POST['title']);
     $body = trim($_POST['body']);
@@ -38,38 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     }
 
     if (!preg_match('/^[А-Яа-яA-Za-zЁё\s\-]{3,50}$/u', $author)) {
-        $errors[] = 'Имя автора должно быть от 3 до 50 букв.';
-    }
-
-    if (!in_array($_POST['is_public'] ?? '', ['yes', 'no'])) {
-        $errors[] = 'Некорректный флаг публичности.';
+        $errors[] = 'Имя автора должно содержать только буквы и быть от 3 до 50 символов.';
     }
 
     if (empty($errors)) {
         $stmt = $pdo->prepare("UPDATE content SET title = ?, body = ?, category = ?, is_public = ?, author = ? WHERE id = ?");
         $stmt->execute([$title, $body, $category, $is_public ? 'true' : 'false', $author, $id]);
-        header('Location: content.php');
-        exit;
-    } else {
-        // повторно заполняем форму при ошибке
-        $editData = [
-            'id' => $id,
-            'title' => $title,
-            'body' => $body,
-            'category' => $category,
-            'is_public' => $is_public,
-            'author' => $author,
-        ];
-    }
-}
-
-if (!isset($editData)) {
-    $stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
-    $stmt->execute([$id]);
-    $editData = $stmt->fetch();
-
-    if (!$editData) {
-        echo "Запись не найдена.";
+        header("Location: content.php");
         exit;
     }
 }
@@ -80,18 +65,18 @@ if (!isset($editData)) {
 <head>
     <meta charset="UTF-8">
     <title>Редактировать запись</title>
+    <link rel="stylesheet" href="css/edit.css">
 </head>
 <body>
 
-<h2>Редактировать запись ID <?= $editData['id'] ?></h2>
-<a href="content.php">← Назад к записям</a><br><br>
+<a href="content.php">← Назад к списку</a>
+<h2>Редактирование записи ID <?= $content['id'] ?></h2>
 
 <?php if (!empty($errors)): ?>
-    <div style="color:red;">
-        <strong>Обнаружены ошибки:</strong>
+    <div class="error">
         <ul>
-            <?php foreach ($errors as $err): ?>
-                <li><?= htmlspecialchars($err) ?></li>
+            <?php foreach ($errors as $e): ?>
+                <li><?= htmlspecialchars($e) ?></li>
             <?php endforeach; ?>
         </ul>
     </div>
@@ -99,32 +84,27 @@ if (!isset($editData)) {
 
 <form method="post">
     <input type="hidden" name="action" value="update">
-    <input type="hidden" name="id" value="<?= $editData['id'] ?>">
+    <input type="hidden" name="id" value="<?= $content['id'] ?>">
 
-    <label>Заголовок:<br>
-        <input type="text" name="title" value="<?= htmlspecialchars($editData['title']) ?>" required>
-    </label><br><br>
+    <label for="title">Заголовок:</label>
+    <input type="text" name="title" id="title" value="<?= htmlspecialchars($content['title']) ?>" required>
 
-    <label>Содержимое:<br>
-        <textarea name="body" rows="5" cols="60" required><?= htmlspecialchars($editData['body']) ?></textarea>
-    </label><br><br>
+    <label for="body">Содержимое:</label>
+    <textarea name="body" id="body" rows="6" required><?= htmlspecialchars($content['body']) ?></textarea>
 
-    <label>Категория:
-        <select name="category" required>
-            <?php foreach (['Новости', 'Объявления', 'Статьи'] as $cat): ?>
-                <option value="<?= $cat ?>" <?= $editData['category'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
-            <?php endforeach; ?>
-        </select>
-    </label><br><br>
+    <label for="category">Категория:</label>
+    <select name="category" id="category" required>
+        <?php foreach (['Новости', 'Объявления', 'Статьи'] as $cat): ?>
+            <option value="<?= $cat ?>" <?= $content['category'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
+        <?php endforeach; ?>
+    </select>
 
-    <label>Публично?<br>
-        <input type="radio" name="is_public" value="yes" <?= $editData['is_public'] ? 'checked' : '' ?>> Да
-        <input type="radio" name="is_public" value="no" <?= !$editData['is_public'] ? 'checked' : '' ?>> Нет
-    </label><br><br>
-
-    <label>Автор:<br>
-        <input type="text" name="author" value="<?= htmlspecialchars($editData['author']) ?>" required>
-    </label><br><br>
+    <label>Публично?</label>
+    <br>
+    <input type="radio" name="is_public" value="yes" <?= $content['is_public'] ? 'checked' : '' ?>> Да
+    <input type="radio" name="is_public" value="no" <?= !$content['is_public'] ? 'checked' : '' ?>> Нет
+    <label for="author">Автор:</label>
+    <input type="text" name="author" id="author" value="<?= htmlspecialchars($content['author']) ?>" required>
 
     <button type="submit">Сохранить</button>
 </form>
