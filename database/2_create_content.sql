@@ -1,4 +1,4 @@
-CREATE TABLE public.content (
+CREATE TABLE IF NOT EXISTS content (
     id integer NOT NULL,
     title character varying(255) NOT NULL,
     body text NOT NULL,

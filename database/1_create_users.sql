@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS public.users (
+CREATE TABLE IF NOT EXISTS users (
     id integer NOT NULL,
     username character varying(50) NOT NULL,
     email character varying(100) NOT NULL,
