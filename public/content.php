@@ -1,16 +1,37 @@
 <?php
+/**
+ * Контент-менеджер — отображение, добавление, удаление и поиск записей.
+ * 
+ * Реализует CRUD-функции для таблицы `content`, доступ к которым ограничен по роли пользователя.
+ * Администраторы могут управлять записями, обычные пользователи — только просматривать.
+ * Используется проверка прав доступа, валидация и вывод ошибок.
+ *
+ * PHP version 8.4.4
+ *
+ * @author Dmitrii 
+ * @author Stanislav
+ * @version  1.0
+ */
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once '../auth/check_auth.php';
 require_once '../config/config.php';
 
+/** @var PDO $pdo Подключение к базе данных */
 $pdo = getPDO();
+
+/** @var PDO $pdo Подключение к базе данных */
 $errors = [];
 
+/** @var string $role Роль текущего пользователя */
 $role = $_SESSION['role'] ?? 'user';
+
+/** @var bool $isAdmin Является ли пользователь администратором */
 $isAdmin = $role === 'admin';
 
+/** @var array|null $editData Данные для редактирования (если выбрана запись) */
 $editData = null;
 
 // service: create
