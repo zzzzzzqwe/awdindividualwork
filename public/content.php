@@ -159,7 +159,7 @@ $contents = $stmt->fetchAll();
     <table border="1" cellpadding="8">
         <thead>
             <tr>
-                <th>ID</th>
+                <!-- <th>ID</th>  !-->
                 <th>Заголовок</th>
                 <th>Содержимое</th>
                 <th>Категория</th>
@@ -174,7 +174,7 @@ $contents = $stmt->fetchAll();
         <tbody>
         <?php foreach ($contents as $c): ?>
             <tr>
-                <td><?= $c['id'] ?></td>
+               <!-- <td><?= $c['id'] ?></td> !-->
                 <td><?= htmlspecialchars($c['title']) ?></td>
                 <td><?= nl2br(htmlspecialchars($c['body'])) ?></td>
                 <td><?= htmlspecialchars($c['category']) ?></td>
