@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="email" name="email" placeholder="Email" required>
         <div class="password-wrapper">
             <input type="password" name="password" id="password" placeholder="Пароль" required>
-            <button type="button" id="togglePassword">🙈</button>
+            <button type="button" id="togglePassword">🙉</button>
         </div>
         <button type="submit">Войти</button>
         <a href="register.php">Нет аккаунта? Зарегистрироваться</a>
