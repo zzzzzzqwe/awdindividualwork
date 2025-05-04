@@ -183,7 +183,6 @@ button[type="submit"]:hover {
 | `created_at` | `timestamp`    | Дата создания                    |
 
 ## Примеры использования проекта
-### Пример регистрации пользователя
 Первое взаимодействие пользователя с проектом происходит на `/register.php`:
 
 ![image](screenshots/Screenshot_1.png)
@@ -211,3 +210,20 @@ button[type="submit"]:hover {
 Также из этого меню открывается возможность перейти в `/admin/create_user.php`, чтобы создать пользователя (валидация работает и здесь):
 
 ![image](screenshots/Screenshot_7.png)
+
+Меню управления контентом позволяет удалять и редактировать существующие записи (валидация работает и здесь):
+
+![image](screenshots/Screenshot_8.png)
+
+Также появляется дополнительная форма на создание нового контента:
+
+![image](screenshots/Screenshot_9.png)
+
+## Источники
+1. [PHP: Официальная документация](https://www.php.net/manual/ru/)  
+2. [PostgreSQL: Официальная документация](https://www.postgresql.org/docs/current/)
+3. [PHP PDO](https://www.php.net/manual/ru/book.pdo.php)
+4. [OWASP SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)  
+5. [HTML: w3schools documentation](https://www.w3schools.com/html/)
+6. [CSS: w3schools documentation](https://www.w3schools.com/css/)
+7. [Javascript: w3schools documentation](https://www.w3schools.com/js/)
