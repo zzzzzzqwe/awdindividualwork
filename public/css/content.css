@@ -22,9 +22,14 @@ a {
 
 form {
     background: #fff;
+    padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+form.nopaddingform {
+    padding: 0;
 }
 
 input[type='text'], textarea, select {

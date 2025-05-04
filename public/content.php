@@ -184,13 +184,13 @@ $contents = $stmt->fetchAll();
                 <?php if ($isAdmin): ?>
                     <td>
                         <!-- delete -->
-                        <form method="post" style="display:inline;" onsubmit="return confirm('Удалить?');">
+                        <form method="post" class="nopaddingform" style="display:inline;" onsubmit="return confirm('Удалить?');">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="content_id" value="<?= $c['id'] ?>">
                             <button type="submit">Удалить</button>
                         </form>
                         <!-- update link -->
-                        <form action="edit.php" method="get" style="display:inline;">
+                        <form action="edit.php" class="nopaddingform" method="get" style="display:inline;">
                         <input type="hidden" name="id" value="<?= $c['id'] ?>">
                          <button type="submit">Редактировать</button>
                             </form>

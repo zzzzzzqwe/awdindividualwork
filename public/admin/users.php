@@ -63,19 +63,19 @@ function getUsernameById($id, $pdo) {
         <td><?= date('Y-m-d H:i:s', strtotime($user['created_at'])) ?></td>
         <td>
             <?php if ($user['role'] !== 'admin'): ?>
-                <form method="post" style="display:inline;">
+                <form method="post" class="nopaddingform" style="display:inline;">
                     <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                     <input type="hidden" name="action" value="make_admin">
                     <button type="submit">Сделать админом</button>
                 </form>
             <?php else: ?>
-                <form method="post" style="display:inline;">
+                <form method="post" class="nopaddingform" style="display:inline;">
                     <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                     <input type="hidden" name="action" value="make_user">
                     <button type="submit">Сделать пользователем</button>
                 </form>
             <?php endif; ?>
-            <form method="post" style="display:inline;" onsubmit="return confirm('Удалить пользователя?');">
+            <form method="post" class="nopaddingform" style="display:inline;" onsubmit="return confirm('Удалить пользователя?');">
                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                 <input type="hidden" name="action" value="delete">
                 <button type="submit">Удалить</button>
