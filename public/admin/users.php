@@ -1,5 +1,19 @@
 <?php
-
+/**
+ * Управление пользователями (только для администраторов).
+ *
+ * Предоставляет возможность:
+ * - назначать пользователей администраторами;
+ * - понижать права до обычного пользователя;
+ * - удалять пользователей (кроме самого себя).
+ *
+ * Данные отображаются в виде таблицы.
+ *
+ * PHP version 8.4.4
+ * 
+ * @author Dmitrii
+ * @author Stanislav
+ */
 require_once '../../auth/check_admin.php';
 require_once '../../config/config.php';
 
@@ -31,6 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $pdo->query("SELECT id, username, email, role, created_at FROM users ORDER BY id ASC");
 $users = $stmt->fetchAll();
 
+/** Получает имя пользователя по ID
+ * 
+ * @param int $id ID пользователя
+ * @param PDO $pdo Подключение к БД
+ * @return string|null Имя пользователя или null, если не найден
+ */
 function getUsernameById($id, $pdo) {
     $stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
     $stmt->execute([$id]);

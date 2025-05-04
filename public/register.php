@@ -1,4 +1,15 @@
 <?php
+/**
+ * Форма регистрации нового пользователя.
+ *
+ * Проверяет корректность введённых данных, уникальность имени и email,
+ * выполняет хеширование пароля и сохраняет данные в таблицу `users`.
+ *
+ * PHP version 8.4.4
+ * 
+ * @author Dmitrii
+ * @author Stanislav
+ */
 session_start();
 require_once '../config/config.php';
 $pdo = getPDO();
